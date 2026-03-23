@@ -6,3 +6,4 @@ speechrecognition
 opencv-python-headless
 numpy
 Pillow
+openpyxl
