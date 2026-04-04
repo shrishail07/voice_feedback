@@ -455,9 +455,9 @@ def append_to_excel(record: dict):
             record.get('Student_Name', ''),
             record.get('Roll_Number', ''),
             record.get('College_Name', ''),
-            recore.get('Department_name', ''),
+            record.get('Department_name', ''),
             record.get('E_mail', ''),
-            record.get('Phone_number', '')
+            record.get('Phone_number', ''),
             record.get('Event_Name', ''),
             str(record.get('Face_Detected', False)),
             record.get('Transcript', ''),
@@ -469,10 +469,10 @@ def append_to_excel(record: dict):
             cell = ws.cell(row=next_row, column=col_idx, value=value)
             cell.font = Font(name="Arial", size=10)
             cell.border = thin_border
-            cell.alignment = Alignment(vertical="center", wrap_text=(col_idx == 6))  # wrap Transcript
+            cell.alignment = Alignment(vertical="center", wrap_text=(col_idx == 10))  # wrap Transcript
 
             # Sentiment column gets color
-            if col_idx == 7:
+            if col_idx == 11:
                 cell.fill = sentiment_fill
             else:
                 cell.fill = row_fill
@@ -530,17 +530,67 @@ create_excel_if_not_exists()
 # UTILITY FUNCTIONS
 # ============================================================
 
+# def load_sample_data():
+#     samples = [
+#         {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Alice Smith', 'Roll_Number': '101', 'Event_Name': 'Hackathon 2026', 'Photo': None, 'Face_Detected': True, 'Transcript': 'The event was absolutely amazing and I learned so much about AI.', 'Sentiment': 'Positive', 'Polarity': 0.8},
+#         {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Bob Jones', 'Roll_Number': '102', 'Event_Name': 'Hackathon 2026', 'Photo': None, 'Face_Detected': True, 'Transcript': 'It was poorly organized and the internet kept dropping. Very frustrating.', 'Sentiment': 'Negative', 'Polarity': -0.6},
+#         {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Charlie Brown', 'Roll_Number': '103', 'Event_Name': 'Science Fair', 'Photo': None, 'Face_Detected': False, 'Transcript': 'It was okay, nothing special but decent overall.', 'Sentiment': 'Neutral', 'Polarity': 0.05},
+#         {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Alice Smith', 'Roll_Number': '101', 'Event_Name': 'Science Fair', 'Photo': None, 'Face_Detected': True, 'Transcript': 'Great presentations, really enjoyed the chemistry experiments!', 'Sentiment': 'Positive', 'Polarity': 0.6},
+#     ]
+#     for s in samples:
+#         append_to_excel(s)
+#     st.session_state['feedbacks'] = load_from_excel()
+
 def load_sample_data():
     samples = [
-        {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Alice Smith', 'Roll_Number': '101', 'Event_Name': 'Hackathon 2026', 'Photo': None, 'Face_Detected': True, 'Transcript': 'The event was absolutely amazing and I learned so much about AI.', 'Sentiment': 'Positive', 'Polarity': 0.8},
-        {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Bob Jones', 'Roll_Number': '102', 'Event_Name': 'Hackathon 2026', 'Photo': None, 'Face_Detected': True, 'Transcript': 'It was poorly organized and the internet kept dropping. Very frustrating.', 'Sentiment': 'Negative', 'Polarity': -0.6},
-        {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Charlie Brown', 'Roll_Number': '103', 'Event_Name': 'Science Fair', 'Photo': None, 'Face_Detected': False, 'Transcript': 'It was okay, nothing special but decent overall.', 'Sentiment': 'Neutral', 'Polarity': 0.05},
-        {'Timestamp': datetime.datetime.now(), 'Student_Name': 'Alice Smith', 'Roll_Number': '101', 'Event_Name': 'Science Fair', 'Photo': None, 'Face_Detected': True, 'Transcript': 'Great presentations, really enjoyed the chemistry experiments!', 'Sentiment': 'Positive', 'Polarity': 0.6},
+        {
+            'Timestamp': datetime.datetime.now(),
+            'Student_Name': 'Alice Smith',
+            'Roll_Number': '101',
+            'College_Name': 'ABC College',
+            'Department_name': 'CSE',
+            'E_mail': 'alice@example.com',
+            'Phone_number': '9876543210',
+            'Event_Name': 'Hackathon 2026',
+            'Face_Detected': True,
+            'Transcript': 'The event was absolutely amazing and I learned so much about AI.',
+            'Sentiment': 'Positive',
+            'Polarity': 0.8
+        },
+        {
+            'Timestamp': datetime.datetime.now(),
+            'Student_Name': 'Bob Jones',
+            'Roll_Number': '102',
+            'College_Name': 'XYZ College',
+            'Department_name': 'ECE',
+            'E_mail': 'bob@example.com',
+            'Phone_number': '9123456780',
+            'Event_Name': 'Hackathon 2026',
+            'Face_Detected': True,
+            'Transcript': 'It was poorly organized and the internet kept dropping. Very frustrating.',
+            'Sentiment': 'Negative',
+            'Polarity': -0.6
+        },
+        {
+            'Timestamp': datetime.datetime.now(),
+            'Student_Name': 'Charlie Brown',
+            'Roll_Number': '103',
+            'College_Name': 'LMN College',
+            'Department_name': 'MECH',
+            'E_mail': 'charlie@example.com',
+            'Phone_number': '9988776655',
+            'Event_Name': 'Science Fair',
+            'Face_Detected': False,
+            'Transcript': 'It was okay, nothing special but decent overall.',
+            'Sentiment': 'Neutral',
+            'Polarity': 0.05
+        }
     ]
+
     for s in samples:
         append_to_excel(s)
-    st.session_state['feedbacks'] = load_from_excel()
 
+    st.session_state['feedbacks'] = load_from_excel()
 
 def analyze_sentiment(text):
     if not text:
