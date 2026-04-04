@@ -683,7 +683,6 @@ if page == "Record Feedback":
         student_name = st.text_input("Full Name *")
         roll_number = st.text_input("Roll Number / ID *")
         College_Name= st.text_input("College Name *")
-        Department_name=st.text_input("Department Name *")
         
     with col2:
         event_name = st.selectbox("Select Event *",
@@ -691,6 +690,8 @@ if page == "Record Feedback":
         if event_name == "Other":
             event_name = st.text_input("Specify Event Name")
         E_mail=st.text_input("Please enter your Email ID")
+        Department_name=st.text_input("Department Name *")
+
 
     st.markdown("---")
 
