@@ -418,7 +418,7 @@ def create_excel_if_not_exists():
 
         # Column widths
         col_widths = {
-            'Timestamp': 22, 'Student_Name': 20, 'Roll_Number': 15, 'College_Name': 22, 'Department_name': 20, 'E_mail':20, 'Phone_number':20
+            'Timestamp': 22, 'Student_Name': 20, 'Roll_Number': 15, 'College_Name': 22, 'Department_name': 20, 'E_mail':20, 'Phone_number':20,
             'Event_Name': 22, 'Face_Detected': 15, 'Transcript': 50,
             'Sentiment': 12, 'Polarity': 12
         }
