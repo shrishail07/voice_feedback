@@ -386,7 +386,7 @@ st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤",
 EXCEL_FILE = "feedback_data.xlsx"
 
 COLUMNS = [
-    'Timestamp', 'Student_Name', 'Roll_Number', 'Event_Name',
+    'Timestamp', 'Student_Name', 'Roll_Number', 'College_Name', 'Department_name', 'E_mail', 'Phone_number', 'Event_Name',
     'Face_Detected', 'Transcript', 'Sentiment', 'Polarity'
 ]
 
@@ -418,7 +418,7 @@ def create_excel_if_not_exists():
 
         # Column widths
         col_widths = {
-            'Timestamp': 22, 'Student_Name': 20, 'Roll_Number': 15,
+            'Timestamp': 22, 'Student_Name': 20, 'Roll_Number': 15, 'College_Name': 22, 'Department_name': 20, 'E_mail':20, 'Phone_number':20
             'Event_Name': 22, 'Face_Detected': 15, 'Transcript': 50,
             'Sentiment': 12, 'Polarity': 12
         }
@@ -454,6 +454,10 @@ def append_to_excel(record: dict):
             record.get('Timestamp', ''),
             record.get('Student_Name', ''),
             record.get('Roll_Number', ''),
+            record.get('College_Name', ''),
+            recore.get('Department_name', ''),
+            record.get('E_mail', ''),
+            record.get('Phone_number', '')
             record.get('Event_Name', ''),
             str(record.get('Face_Detected', False)),
             record.get('Transcript', ''),
