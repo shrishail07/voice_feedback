@@ -683,6 +683,8 @@ if page == "Record Feedback":
         student_name = st.text_input("Full Name *")
         roll_number = st.text_input("Roll Number / ID *")
         College_Name= st.text_input("College Name *")
+        Phone_number = st.text_input("Phone Number *")  
+
         
     with col2:
         event_name = st.selectbox("Select Event *",
@@ -768,6 +770,10 @@ if page == "Record Feedback":
                         'Timestamp': submission_time,
                         'Student_Name': student_name,
                         'Roll_Number': roll_number,
+                        'College_Name': College_Name,        # ✅ add
+                        'Department_name': Department_name,  # ✅ add
+                        'E_mail': E_mail,                    # ✅ add
+                        'Phone_number': Phone_number,
                         'Event_Name': event_name,
                         'Face_Detected': face_detected,
                         'Transcript': transcript,
