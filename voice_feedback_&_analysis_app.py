@@ -14,7 +14,7 @@ from openpyxl import Workbook, load_workbook
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤", layout="wide")
 
-st.image(        "pragyan_ai_school_cover.jpg", width=1000)
+st.image("pragyan_ai_school_cover.jpg", width=1200)
 
 # --- PASSWORD CONFIGURATION ---
 ADMIN_PASSWORD = "PRAGYANAI"
