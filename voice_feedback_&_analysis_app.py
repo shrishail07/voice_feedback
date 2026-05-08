@@ -112,7 +112,8 @@ except ImportError:
     HAS_SR = False
 
 # --- EXCEL CONFIGURATION ---
-EXCEL_FILE = "feedback_data.xlsx"
+# EXCEL_FILE = "feedback_data.xlsx"
+EXCEL_FILE = os.path.join(os.getcwd(), "feedback_data.xlsx")
 COLUMNS = [
     'Timestamp', 'Student_Name', 'Roll_Number', 'College_Name', 'Department_name', 
     'E_mail', 'Phone_number', 'Event_Name', 'Face_Detected', 'Transcript', 'Sentiment', 'Polarity'
@@ -286,13 +287,42 @@ elif page == "Analysis Dashboard":
     else:
         st.header("📊 Cumulative Feedback History")
 
-        # Load fresh data
-        df = load_from_excel()
+        # ============================================================
+        # 📥 LOAD DATA SAFELY
+        # ============================================================
+        try:
+            df = pd.read_excel(EXCEL_FILE, engine='openpyxl')
+        except Exception as e:
+            st.error(f"Error reading Excel file: {e}")
+            st.stop()
 
-        # ❌ STOP if no data
-        if df.empty:
+        # Clean column names (VERY IMPORTANT)
+        df.columns = df.columns.str.strip()
+
+        # ============================================================
+        # ✅ REQUIRED COLUMN CHECK
+        # ============================================================
+        required_cols = [
+            'Timestamp', 'Student_Name', 'Roll_Number',
+            'Event_Name', 'Sentiment', 'Polarity'
+        ]
+
+        missing_cols = [col for col in required_cols if col not in df.columns]
+
+        if missing_cols:
+            st.error(f"❌ Missing columns in Excel: {missing_cols}")
+            st.stop()
+
+        # ============================================================
+        # ❌ STOP IF EMPTY
+        # ============================================================
+        if df.shape[0] == 0:
             st.warning("⚠️ No data recorded yet. Please submit feedback first.")
             st.stop()
+
+        # Convert timestamp safely
+        if 'Timestamp' in df.columns:
+            df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
 
         # ============================================================
         # 📊 TOP METRICS
@@ -322,7 +352,7 @@ elif page == "Analysis Dashboard":
         with tab1:
             st.subheader("Event-wise Feedback Distribution")
 
-            event_list = df['Event_Name'].unique()
+            event_list = df['Event_Name'].dropna().unique()
             event = st.selectbox("Select Event", event_list)
 
             edf = df[df['Event_Name'] == event]
@@ -353,7 +383,7 @@ elif page == "Analysis Dashboard":
         with tab2:
             st.subheader("Student Feedback History")
 
-            student_list = sorted(df['Student_Name'].dropna().unique())
+            student_list = df['Student_Name'].dropna().unique()
             student = st.selectbox("Select Student", student_list)
 
             sdf = df[df['Student_Name'] == student]
@@ -366,13 +396,17 @@ elif page == "Analysis Dashboard":
 
             with col2:
                 st.write("### Sentiment Trend")
-                fig = px.line(
-                    sdf,
-                    x='Timestamp',
-                    y='Polarity',
-                    markers=True
-                )
-                st.plotly_chart(fig, use_container_width=True)
+
+                if 'Timestamp' in sdf.columns and not sdf['Timestamp'].isna().all():
+                    fig = px.line(
+                        sdf,
+                        x='Timestamp',
+                        y='Polarity',
+                        markers=True
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info("No timestamp data available for trend.")
 
         # ============================================================
         # TAB 3: SENTIMENT ANALYSIS
