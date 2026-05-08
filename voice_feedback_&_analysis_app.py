@@ -767,12 +767,24 @@ elif page == "Analysis Dashboard":
 
             st.markdown("---")
             col_s1, col_s2 = st.columns([1, 3])
+            # with col_s1:
+            #     recent_photo = student_df.iloc[-1]['Photo']
+            #     if recent_photo is not None:
+            #         st.image(recent_photo, caption="Student Photo", use_container_width=True)
+            #     else:
+            #         st.image("https://api.dicebear.com/7.x/initials/svg?seed=" + student_df.iloc[-1]['Student_Name'], caption="No Photo")
             with col_s1:
-                recent_photo = student_df.iloc[-1]['Photo']
+                try:
+                    recent_photo = student_df.iloc[-1]['Photo'] if 'Photo' in student_df.columns and len(student_df) > 0 else None
+                except (IndexError, KeyError):
+                    recent_photo = None
+
+                student_name_display = student_df.iloc[-1]['Student_Name'] if len(student_df) > 0 else "Student"
+
                 if recent_photo is not None:
                     st.image(recent_photo, caption="Student Photo", use_container_width=True)
                 else:
-                    st.image("https://api.dicebear.com/7.x/initials/svg?seed=" + student_df.iloc[-1]['Student_Name'], caption="No Photo")
+                    st.image("https://api.dicebear.com/7.x/initials/svg?seed=" + student_name_display, caption="No Photo")
             with col_s2:
                 st.subheader(student_df.iloc[-1]['Student_Name'])
                 st.write(f"**Roll Number:** {selected_roll}")
