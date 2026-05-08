@@ -33,33 +33,164 @@ st.image("pragyan_ai_school_cover.jpg", width=1150)
 
 st.markdown("""
     <style>
+        /* ── Main Background ── */
         .stApp {
-            background-color: white;
-            color: black;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            color: #1a1b4b;
         }
-        
-        /* Sidebar */
+
+        /* ── Sidebar ── */
         [data-testid="stSidebar"] {
-            background-color: black;
-            color: white;
+            background: linear-gradient(180deg, #1a1b4b 0%, #2d2f6b 100%);
         }
-        
-        /* Sidebar text */
         [data-testid="stSidebar"] * {
             color: white !important;
         }
-        
-        /* Buttons */
-        .stButton > button {
-            background-color: black;
-            color: white;
-            border: 1px solid black;
+        [data-testid="stSidebar"] .stButton > button {
+            background: linear-gradient(90deg, #FF6B35, #ff8c42);
+            color: white !important;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            width: 100%;
         }
-        
-        /* Input fields */
-        .stTextInput > div > div > input {
-            background-color: white;
-            color: black;
+
+        /* ── Page Title ── */
+        h1 {
+            color: #1a1b4b !important;
+            font-weight: 800 !important;
+            border-bottom: 3px solid #FF6B35;
+            padding-bottom: 10px;
+        }
+
+        /* ── Section Headers (h2, h3) ── */
+        h2, h3 {
+            color: #1a1b4b !important;
+            font-weight: 700 !important;
+        }
+
+        /* ── Input Fields ── */
+        .stTextInput > div > div > input,
+        .stTextArea > div > div > textarea {
+            background-color: white !important;
+            color: #1a1b4b !important;
+            border: 2px solid #d0d4e8 !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-size: 14px !important;
+        }
+        .stTextInput > div > div > input:focus,
+        .stTextArea > div > div > textarea:focus {
+            border-color: #FF6B35 !important;
+            box-shadow: 0 0 0 2px rgba(255,107,53,0.2) !important;
+        }
+
+        /* ── Selectbox ── */
+        .stSelectbox > div > div {
+            background-color: white !important;
+            border: 2px solid #d0d4e8 !important;
+            border-radius: 8px !important;
+            color: #1a1b4b !important;
+        }
+
+        /* ── Buttons ── */
+        .stButton > button {
+            background: linear-gradient(90deg, #1a1b4b, #2d2f6b);
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 10px 24px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease !important;
+        }
+        .stButton > button:hover {
+            background: linear-gradient(90deg, #FF6B35, #ff8c42) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,107,53,0.4) !important;
+        }
+
+        /* ── Primary Submit Button ── */
+        .stFormSubmitButton > button {
+            background: linear-gradient(90deg, #FF6B35, #ff8c42) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 12px 32px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+        }
+        .stFormSubmitButton > button:hover {
+            background: linear-gradient(90deg, #1a1b4b, #2d2f6b) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(26,27,75,0.4) !important;
+        }
+
+        /* ── Metric Cards ── */
+        [data-testid="metric-container"] {
+            background: white;
+            border: 1px solid #e0e4f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(26,27,75,0.08);
+            border-left: 4px solid #FF6B35 !important;
+        }
+        [data-testid="metric-container"] label {
+            color: #6b7280 !important;
+            font-size: 13px !important;
+        }
+        [data-testid="metric-container"] [data-testid="metric-value"] {
+            color: #1a1b4b !important;
+            font-weight: 800 !important;
+        }
+
+        /* ── Info / Warning / Success Boxes ── */
+        .stAlert {
+            border-radius: 10px !important;
+            border-left: 4px solid #FF6B35 !important;
+        }
+
+        /* ── Tabs ── */
+        .stTabs [data-baseweb="tab-list"] {
+            background: white;
+            border-radius: 10px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            background: transparent;
+            color: #1a1b4b !important;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .stTabs [aria-selected="true"] {
+            background: linear-gradient(90deg, #FF6B35, #ff8c42) !important;
+            color: white !important;
+        }
+
+        /* ── Dataframe ── */
+        .stDataFrame {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e0e4f0;
+        }
+
+        /* ── Radio buttons ── */
+        .stRadio > div {
+            background: white;
+            border-radius: 10px;
+            padding: 8px 16px;
+            border: 1px solid #e0e4f0;
+        }
+
+        /* ── Download buttons ── */
+        .stDownloadButton > button {
+            background: linear-gradient(90deg, #1a1b4b, #2d2f6b) !important;
+            color: white !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
         }
     </style>
 """, unsafe_allow_html=True)
