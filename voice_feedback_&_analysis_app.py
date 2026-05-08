@@ -598,6 +598,7 @@
 #                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 #                     )
 
+
 import streamlit as st
 import pandas as pd
 from textblob import TextBlob
@@ -615,83 +616,78 @@ from openpyxl.utils import get_column_letter
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤", layout="wide")
 
-# --- CUSTOM CSS FOR COLORFUL UI ---
-def apply_custom_style():
+# ============================================================
+# CUSTOM COLORFUL CSS STYLING
+# ============================================================
+def apply_custom_styles():
     st.markdown("""
-        <style>
-        /* Main background color */
+    <style>
+        /* Main Background */
         .stApp {
-            background-color: #f0f4f8;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
-        /* Sidebar styling */
+        /* Sidebar Styling */
         [data-testid="stSidebar"] {
-            background-color: #1e293b !important;
-            color: white;
+            background-color: #1e3a8a !important;
+        }
+        [data-testid="stSidebar"] * {
+            color: white !important;
         }
         
-        /* Change Sidebar text color to white */
-        [data-testid="stSidebar"] .css-17l2puu, [data-testid="stSidebar"] .css-pk480e, [data-testid="stSidebar"] p {
-            color: #cbd5e1 !important;
-        }
-
-        /* Titles and headers */
-        h1 {
-            color: #1e40af;
+        /* Headers */
+        h1, h2, h3 {
+            color: #1e3a8a !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: 800;
-        }
-        
-        h2, h3 {
-            color: #334155;
         }
 
-        /* Gradient buttons */
+        /* Buttons Styling (Standard) */
         div.stButton > button:first-child {
-            background: linear-gradient(to right, #3b82f6, #8b5cf6);
-            color: white;
-            border: none;
+            background-color: #3b82f6;
+            color: white !important;
             border-radius: 8px;
-            padding: 0.6rem 2rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        div.stButton > button:hover {
-            background: linear-gradient(to right, #2563eb, #7c3aed);
-            transform: scale(1.02);
-            color: white;
             border: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        div.stButton > button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
 
-        /* Secondary/Record button logic (if any) */
+        /* Submit Button (Primary) */
         div.stFormSubmitButton > button {
-            background: linear-gradient(to right, #059669, #10b981) !important;
+            background: linear-gradient(to right, #10b981, #059669) !important;
+            color: white !important;
+            width: 100%;
+            border-radius: 10px !important;
+            font-size: 18px !important;
             border: none !important;
         }
 
-        /* Input field styling */
-        .stTextInput>div>div>input, .stSelectbox>div>div>div {
-            border-radius: 10px;
-            border: 1px solid #cbd5e1;
+        /* Input Boxes */
+        .stTextInput > div > div > input, .stTextArea > div > div > textarea {
+            border: 2px solid #cbd5e1 !important;
+            border-radius: 8px !important;
         }
 
-        /* Metric card styling */
+        /* Metric Cards */
         [data-testid="stMetricValue"] {
-            color: #1e40af;
+            color: #1e40af !important;
             font-weight: bold;
         }
         
-        /* Success/Warning box styling */
-        .stAlert {
-            border-radius: 12px;
-            border: none;
+        /* Container/Card Effect */
+        div[data-testid="stVerticalBlock"] > div.element-container:has(div.stAlert) {
+            border-radius: 10px;
         }
-        </style>
+    </style>
     """, unsafe_allow_html=True)
 
-apply_custom_style()
+apply_custom_styles()
 
 # Optional: Speech recognition setup
 try:
@@ -723,7 +719,6 @@ def create_excel_if_not_exists():
             cell = ws.cell(row=1, column=col_idx, value=header)
             cell.fill = header_fill
             cell.font = header_font
-            cell.alignment = Alignment(horizontal="center", vertical="center")
         wb.save(EXCEL_FILE)
 
 def append_to_excel(record: dict):
@@ -732,19 +727,13 @@ def append_to_excel(record: dict):
         wb = load_workbook(EXCEL_FILE)
         ws = wb.active
         next_row = ws.max_row + 1
-        row_fill = PatternFill("solid", start_color="D6E4F0") if next_row % 2 == 0 else PatternFill("solid", start_color="FFFFFF")
-        sentiment_colors = {"Positive": "C6EFCE", "Negative": "FFC7CE", "Neutral": "FFEB9C"}
-        sentiment_fill = PatternFill("solid", start_color=sentiment_colors.get(record.get('Sentiment', 'Neutral'), "FFFFFF"))
-        
         row_data = [record.get(col, '') for col in COLUMNS]
         for col_idx, value in enumerate(row_data, 1):
-            cell = ws.cell(row=next_row, column=col_idx, value=value)
-            cell.fill = sentiment_fill if col_idx == 11 else row_fill
-            if col_idx == 12: cell.value = round(float(value), 4)
+            ws.cell(row=next_row, column=col_idx, value=value)
         wb.save(EXCEL_FILE)
         return True
     except Exception as e:
-        st.error(f"⚠️ Excel Save Error: {e}")
+        st.error(f"⚠️ Error: {e}")
         return False
 
 def load_from_excel():
@@ -804,10 +793,10 @@ def transcribe_audio(audio_bytes):
 if 'feedbacks' not in st.session_state:
     st.session_state['feedbacks'] = load_from_excel()
 
-st.title("🎤 Student Voice Feedback System")
+st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>🎤 PRAGYAN AI: Feedback System</h1>", unsafe_allow_html=True)
 page = st.sidebar.radio("Navigate", ["Record Feedback", "Analysis Dashboard"])
 
-# --- SIDEBAR ADMIN CONTROLS ---
+# Sidebar Admin
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔒 Admin Access")
 pwd_input = st.sidebar.text_input("Admin Password", type="password")
@@ -815,60 +804,41 @@ is_admin = (pwd_input == ADMIN_PASSWORD)
 
 if is_admin:
     st.sidebar.success("Access Granted")
-    if st.sidebar.button("🔄 Refresh Master Data"):
-        st.session_state['feedbacks'] = load_from_excel()
-        st.sidebar.info("Data refreshed!")
-    
     excel_data = get_excel_download()
     if excel_data:
-        st.sidebar.download_button(
-            label="📥 Download Master Excel",
-            data=excel_data,
-            file_name=f"feedback_master_{datetime.date.today()}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-elif pwd_input != "":
-    st.sidebar.error("Incorrect Password")
+        st.sidebar.download_button("📥 Download Master Excel", data=excel_data, 
+                                   file_name=f"feedback_{datetime.date.today()}.xlsx")
 
 # --- PAGE 1: RECORD FEEDBACK ---
 if page == "Record Feedback":
-    st.header("📝 Submit Your Feedback")
+    st.markdown("### 📝 Enter Your Experience")
     
     with st.container(border=True):
-        st.subheader("Student & Event Information")
+        st.subheader("1️⃣ Student Details")
         c1, c2 = st.columns(2)
         with c1:
-            s_name = st.text_input("Full Name *", placeholder="Enter your name")
-            s_roll = st.text_input("Roll Number *", placeholder="e.g. 2026-CS-01")
-            s_college = st.text_input("College Name", placeholder="Your institution")
+            s_name = st.text_input("Full Name *")
+            s_roll = st.text_input("Roll Number *")
         with c2:
-            s_event = st.selectbox("Select Event", ["Hackathon 2026", "Science Fair", "Sports Meet", "Annual Tech Fest", "Other"])
-            s_email = st.text_input("Email ID", placeholder="example@email.com")
-            s_phone = st.text_input("Phone Number", placeholder="Mobile number")
+            s_event = st.selectbox("Event", ["Hackathon 2026", "Science Fair", "Sports Meet", "Other"])
+            s_email = st.text_input("Email ID")
 
-    st.markdown("### 📸 Photo Verification")
-    img_file = st.camera_input("Smile for the camera!")
-    if img_file:
-        preview, count, detected = detect_faces(img_file.getvalue())
-        if preview:
-            st.image(preview, width=350, caption="Face Detection Preview")
-            if detected: st.success("✅ Face Verified Successfully!")
-            else: st.warning("⚠️ No face detected. Please position yourself clearly.")
-
-    st.markdown("### 🎙️ Audio Feedback")
+    st.subheader("2️⃣ 📸 Photo ID")
+    img_file = st.camera_input("Verify Your Face")
+    
+    st.subheader("3️⃣ 🎙️ Your Voice")
     with st.form("main_form", clear_on_submit=True):
-        audio_data = st.audio_input("Record your voice")
-        text_data = st.text_area("Or type your comments here...", placeholder="Your feedback matters to us!")
+        audio_data = st.audio_input("Record Feedback")
+        text_data = st.text_area("Or type your thoughts...")
         submitted = st.form_submit_button("🚀 SUBMIT FEEDBACK")
 
         if submitted:
             if not s_name or not s_roll:
-                st.error("Please provide your Name and Roll Number.")
+                st.error("Please provide Name and Roll Number.")
             else:
-                with st.spinner("Processing Submission..."):
+                with st.spinner("Processing..."):
                     transcript = transcribe_audio(audio_data.getvalue()) if audio_data else text_data
                     sentiment, score = analyze_sentiment(transcript)
-                    
                     face_verified = False
                     if img_file:
                         _, _, face_verified = detect_faces(img_file.getvalue())
@@ -876,71 +846,36 @@ if page == "Record Feedback":
                     record = {
                         'Timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         'Student_Name': s_name, 'Roll_Number': s_roll,
-                        'College_Name': s_college, 'Department_name': "General",
-                        'E_mail': s_email, 'Phone_number': s_phone,
                         'Event_Name': s_event, 'Face_Detected': face_verified,
-                        'Transcript': transcript, 'Sentiment': sentiment, 'Polarity': score
+                        'Transcript': transcript, 'Sentiment': sentiment, 'Polarity': score,
+                        'E_mail': s_email, 'College_Name': 'N/A', 'Department_name': 'General', 'Phone_number': 'N/A'
                     }
-                    
                     if append_to_excel(record):
-                        st.success(f"✅ Submission Received! Analysis: {sentiment}")
+                        st.success(f"Successfully Submitted! Detected Sentiment: {sentiment}")
                         st.session_state['feedbacks'] = load_from_excel()
                         st.balloons()
 
 # --- PAGE 2: ANALYSIS DASHBOARD ---
 elif page == "Analysis Dashboard":
-    st.header("📊 Insightful Analytics")
+    st.markdown("### 📊 Real-time Feedback Insights")
     df = st.session_state['feedbacks']
 
     if df.empty:
-        st.info("The feedback database is currently empty.")
+        st.info("No data available yet.")
     else:
-        # Top Metrics Section
-        col_m1, col_m2, col_m3 = st.columns(3)
-        col_m1.metric("Total Submissions", len(df))
-        col_m2.metric("Active Students", df['Roll_Number'].nunique())
-        avg_score = df['Polarity'].mean()
-        col_m3.metric("Net Sentiment Score", f"{avg_score:.2f}")
+        m1, m2, m3 = st.columns(3)
+        m1.metric("Total Records", len(df))
+        m2.metric("Unique Students", df['Roll_Number'].nunique())
+        m3.metric("Overall Sentiment", f"{df['Polarity'].mean():.2f}")
 
-        t1, t2, t3 = st.tabs(["🎯 Event Performance", "👤 Student Journey", "📑 Raw Data Records"])
-
+        t1, t2 = st.tabs(["📈 Charts", "👤 Individual Records"])
         with t1:
-            event_pick = st.selectbox("Select Event for Analysis", df['Event_Name'].unique())
-            edf = df[df['Event_Name'] == event_pick]
-            fig = px.pie(edf, names='Sentiment', hole=0.4, title=f"Sentiment Breakdown: {event_pick}",
-                         color='Sentiment', 
+            fig = px.pie(df, names='Sentiment', color='Sentiment', title="Sentiment Distribution",
                          color_discrete_map={'Positive':'#10b981','Negative':'#ef4444','Neutral':'#f59e0b'})
             st.plotly_chart(fig, use_container_width=True)
 
         with t2:
-            student_opts = df.apply(lambda x: f"{x['Student_Name']} ({x['Roll_Number']})", axis=1).unique()
-            selected_s = st.selectbox("Search Student Profile", student_opts)
-            target_roll = str(selected_s.rsplit('(', 1)[-1].rstrip(')'))
-            sdf = df[df['Roll_Number'].astype(str) == target_roll]
-
-            if not sdf.empty:
-                st.subheader(f"History for {sdf.iloc[-1]['Student_Name']}")
-                for _, row in sdf.sort_values('Timestamp', ascending=False).iterrows():
-                    color = "#10b981" if row['Sentiment'] == 'Positive' else "#ef4444" if row['Sentiment'] == 'Negative' else "#f59e0b"
-                    with st.expander(f"📌 {row['Event_Name']} | {row['Timestamp']}"):
-                        st.markdown(f"<span style='color:{color}; font-weight:bold;'>Sentiment: {row['Sentiment']}</span>", unsafe_allow_html=True)
-                        st.write(f"💬 {row['Transcript']}")
-                        st.caption(f"Face Verified: {'✅' if row['Face_Detected'] else '❌'}")
-
-        with t3:
-            st.subheader("Feedback Master Log")
-            st.dataframe(df, use_container_width=True)
-            
-            if is_admin:
-                st.write("---")
-                st.markdown("### 📥 Admin Data Export")
-                ca, cb = st.columns(2)
-                with ca:
-                    csv_data = df.to_csv(index=False).encode('utf-8')
-                    st.download_button("Export as CSV", csv_data, "feedback_data.csv", "text/csv")
-                with cb:
-                    master_excel = get_excel_download()
-                    if master_excel:
-                        st.download_button("Export as Excel (.xlsx)", master_excel, "feedback_data.xlsx")
-            else:
-                st.warning("🔒 Enter the Admin Password in the sidebar to enable data export buttons.")
+            student_list = df['Student_Name'].unique()
+            sel_s = st.selectbox("View Student", student_list)
+            sdf = df[df['Student_Name'] == sel_s]
+            st.dataframe(sdf[['Timestamp', 'Event_Name', 'Sentiment', 'Transcript']])
