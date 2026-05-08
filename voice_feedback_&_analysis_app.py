@@ -269,18 +269,34 @@ if page == "Record Feedback":
                     st.balloons()
 
 # --- PAGE 2: ANALYSIS DASHBOARD ---
+# elif page == "Analysis Dashboard":
+#     st.header("📊 Feedback Analysis Dashboard")
+#     df = load_from_excel()
+
+#     if df.empty:
+#         st.info("No data available yet.")
+#     else:
+#         m1, m2, m3 = st.columns(3)
+#         m1.metric("Total Submissions", len(df))
+#         m2.metric("Unique Students", df['Roll_Number'].nunique())
+#         m3.metric("Avg Sentiment Score", round(df['Polarity'].mean(), 2))
 elif page == "Analysis Dashboard":
-    st.header("📊 Feedback Analysis Dashboard")
-    df = st.session_state['feedbacks']
-
-    if df.empty:
-        st.info("No data available yet.")
+    if not is_admin:
+        st.warning("🔒 Access Denied. Please enter the admin password in the sidebar.")
     else:
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Total Submissions", len(df))
-        m2.metric("Unique Students", df['Roll_Number'].nunique())
-        m3.metric("Avg Sentiment Score", round(df['Polarity'].mean(), 2))
+        st.header("📊 Cumulative Feedback History")
 
+        # ✅ FIX IS HERE
+        df = load_from_excel()
+
+        if df.empty:
+            st.info("No data recorded yet.")
+        else:
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Total Feedbacks (All Time)", len(df))
+            m2.metric("Unique Students", df['Roll_Number'].nunique())
+            m3.metric("Avg Sentiment Score", round(df['Polarity'].mean(), 2))
+            
         tab1, tab2, tab3 = st.tabs(["Event View", "Student History", "Raw Data"])
 
         with tab1:
