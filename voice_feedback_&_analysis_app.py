@@ -55,6 +55,35 @@ st.markdown("""
             width: 100%;
         }
 
+        /* ── SIDEBAR NAVIGATE RADIO FIX ── */
+        [data-testid="stSidebar"] .stRadio > div {
+            background: transparent !important;
+            border: none !important;
+            padding: 4px 0 !important;
+        }
+        [data-testid="stSidebar"] .stRadio label {
+            color: white !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            background: rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+            padding: 8px 14px !important;
+            margin: 4px 0 !important;
+            display: block !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        [data-testid="stSidebar"] .stRadio label:hover {
+            background: rgba(255,107,53,0.4) !important;
+        }
+        [data-testid="stSidebar"] [aria-checked="true"] + div label,
+        [data-testid="stSidebar"] .stRadio [data-checked="true"] label {
+            background: linear-gradient(90deg, #FF6B35, #ff8c42) !important;
+        }
+        [data-testid="stSidebar"] .stRadio > div > div {
+            gap: 6px !important;
+        }
+
         /* ── Page Title ── */
         h1 {
             color: #1a1b4b !important;
@@ -69,7 +98,7 @@ st.markdown("""
             font-weight: 700 !important;
         }
 
-        /* ── Input Field Labels (FIX) ── */
+        /* ── Input Field Labels ── */
         .stTextInput label,
         .stTextArea label,
         .stSelectbox label,
@@ -82,28 +111,50 @@ st.markdown("""
             font-size: 14px !important;
         }
 
-        /* ── Input Fields ── */
-        .stTextInput > div > div > input,
-        .stTextArea > div > div > textarea {
-            background-color: white !important;
+        /* ── COLORFUL INPUT FIELDS ── */
+        .stTextInput > div > div > input {
+            background: linear-gradient(135deg, #eef2ff, #f0f4ff) !important;
             color: #1a1b4b !important;
-            border: 2px solid #d0d4e8 !important;
-            border-radius: 8px !important;
-            padding: 8px 12px !important;
+            border: 2px solid #c7d0f0 !important;
+            border-radius: 10px !important;
+            padding: 10px 14px !important;
             font-size: 14px !important;
+            font-weight: 500 !important;
+            box-shadow: 0 2px 6px rgba(26,27,75,0.06) !important;
+            transition: all 0.3s ease !important;
         }
-        .stTextInput > div > div > input:focus,
-        .stTextArea > div > div > textarea:focus {
+        .stTextInput > div > div > input:focus {
+            background: white !important;
             border-color: #FF6B35 !important;
-            box-shadow: 0 0 0 2px rgba(255,107,53,0.2) !important;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.15) !important;
+        }
+        .stTextInput > div > div > input::placeholder {
+            color: #9da8c7 !important;
         }
 
-        /* ── Selectbox ── */
-        .stSelectbox > div > div {
-            background-color: white !important;
-            border: 2px solid #d0d4e8 !important;
-            border-radius: 8px !important;
+        /* ── COLORFUL TEXT AREA ── */
+        .stTextArea > div > div > textarea {
+            background: linear-gradient(135deg, #eef2ff, #f0f4ff) !important;
             color: #1a1b4b !important;
+            border: 2px solid #c7d0f0 !important;
+            border-radius: 10px !important;
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            box-shadow: 0 2px 6px rgba(26,27,75,0.06) !important;
+        }
+        .stTextArea > div > div > textarea:focus {
+            background: white !important;
+            border-color: #FF6B35 !important;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.15) !important;
+        }
+
+        /* ── COLORFUL SELECTBOX ── */
+        .stSelectbox > div > div {
+            background: linear-gradient(135deg, #fff4ee, #fff0e8) !important;
+            border: 2px solid #ffb899 !important;
+            border-radius: 10px !important;
+            color: #1a1b4b !important;
+            box-shadow: 0 2px 6px rgba(255,107,53,0.1) !important;
         }
 
         /* ── Buttons ── */
@@ -123,7 +174,7 @@ st.markdown("""
             box-shadow: 0 4px 12px rgba(255,107,53,0.4) !important;
         }
 
-        /* ── Primary Submit Button ── */
+        /* ── Submit Button ── */
         .stFormSubmitButton > button {
             background: linear-gradient(90deg, #FF6B35, #ff8c42) !important;
             color: white !important;
@@ -159,7 +210,7 @@ st.markdown("""
             font-weight: 800 !important;
         }
 
-        /* ── Info / Warning / Success Boxes ── */
+        /* ── Alert Boxes ── */
         .stAlert {
             border-radius: 10px !important;
             border-left: 4px solid #FF6B35 !important;
@@ -190,7 +241,7 @@ st.markdown("""
             border: 1px solid #e0e4f0;
         }
 
-        /* ── Radio Buttons ── */
+        /* ── Main Area Radio ── */
         .stRadio > div {
             background: white;
             border-radius: 10px;
