@@ -1591,7 +1591,10 @@ elif page == "Analysis Dashboard":
             st.markdown("---")
             col_s1, col_s2 = st.columns([1, 3])
             with col_s1:
-                recent_photo = student_df.iloc[-1]['Photo']
+                try:
+                        recent_photo = student_df.iloc[-1]['Photo'] if 'Photo' in student_df.columns else None
+                except (IndexError, KeyError):
+                        recent_photo = None
                 if recent_photo is not None:
                     st.image(recent_photo, caption="Student Photo", use_container_width=True)
                 else:
