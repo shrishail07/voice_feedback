@@ -67,13 +67,10 @@ def apply_black_white_theme():
         }
 
         /* Ensure the text inside the button is white */
-        div.stButton > button p, 
-        div.stDownloadButton > button p,
-        div.stButton > button div,
-        div.stDownloadButton > button div,
-        div.stButton > button span,
-        div.stDownloadButton > button span {
-            color: #FFFFFF !important;
+        div.stButton > button *, 
+        div.stDownloadButton > button *,
+        div.stFormSubmitButton > button * {
+           color: #FFFFFF !important;
         }
         
         /* Hover state */
