@@ -283,14 +283,12 @@ import cv2
 import numpy as np
 from PIL import Image
 from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils import get_column_letter
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤", layout="wide")
 
 # ============================================================
-# CUSTOM CSS: WHITE BACKGROUND & BLACK THEME
+# FIXED CSS: ENSURES TYPED TEXT IS BLACK
 # ============================================================
 def apply_black_white_theme():
     st.markdown("""
@@ -300,54 +298,62 @@ def apply_black_white_theme():
             background-color: #FFFFFF !important;
         }
 
-        /* 2. All Text, Headers, and Labels to Black */
-        h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stText, 
+        /* 2. Force ALL text (Typed, Label, Header) to Black */
+        h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stText, span, 
         [data-testid="stMetricLabel"], [data-testid="stHeader"] {
             color: #000000 !important;
         }
 
-        /* 3. Metric Values to Black */
+        /* 3. FIXED: Typing Text Color inside Inputs/Textareas */
+        input, textarea {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important; /* For Safari/Chrome */
+        }
+
+        /* 4. Metric Values to Black */
         [data-testid="stMetricValue"] {
             color: #000000 !important;
             font-weight: bold;
         }
 
-        /* 4. Buttons: Black Background with White Text */
+        /* 5. Buttons: Black with White Text */
         div.stButton > button, .stDownloadButton > button {
             background-color: #000000 !important;
             color: #FFFFFF !important;
-            border-radius: 5px;
             border: 1px solid #000000;
-            padding: 0.5rem 1rem;
-            font-weight: bold;
-            transition: 0.3s;
         }
         
-        /* 5. Button Hover Effect */
-        div.stButton > button:hover, .stDownloadButton > button:hover {
+        div.stButton > button:hover {
             background-color: #333333 !important;
             color: #FFFFFF !important;
         }
 
-        /* 6. Form Submission Button (Specific) */
+        /* 6. Form Submission Button */
         div.stFormSubmitButton > button {
             background-color: #000000 !important;
             color: #FFFFFF !important;
             width: 100%;
         }
 
-        /* 7. Tabs Styling */
-        button[data-baseweb="tab"] {
-            color: #000000 !important;
-        }
-        button[data-baseweb="tab"][aria-selected="true"] {
-            background-color: #EEEEEE !important;
-            border-bottom-color: #000000 !important;
+        /* 7. Icons & Logos (Force them to black) */
+        svg {
+            fill: #000000 !important;
         }
 
-        /* 8. Input field borders for visibility on white */
-        .stTextInput > div > div > input, .stTextArea > div > div > textarea, .stSelectbox > div {
+        /* 8. Input field borders visibility */
+        .stTextInput > div > div > input, 
+        .stTextArea > div > div > textarea, 
+        .stSelectbox > div {
             border: 1px solid #000000 !important;
+            background-color: #FFFFFF !important;
+        }
+        
+        /* 9. Sidebar Text */
+        [data-testid="stSidebar"] {
+            background-color: #F8F9FA !important;
+            border-right: 1px solid #EEEEEE;
+        }
+        [data-testid="stSidebar"] .stRadio label {
             color: #000000 !important;
         }
     </style>
