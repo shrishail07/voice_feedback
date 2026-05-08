@@ -20,6 +20,7 @@ st.set_page_config(
     page_icon="🎤",
     layout="wide"
 )
+st.image("pragyan_ai_school_cover.jpg", width=1200)
 
 # ============================================================
 # OPTIONAL SPEECH RECOGNITION
