@@ -552,7 +552,7 @@ st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤",
 ADMIN_PASSWORD = "PRAGYANAI"
 
 # ============================================================
-# FIXED CSS: ENSURES TYPED TEXT IS BLACK & HIGH CONTRAST
+# FIXED CSS: ENSURES BUTTON TEXT IS WHITE AND VISIBLE
 # ============================================================
 def apply_black_white_theme():
     st.markdown("""
@@ -562,13 +562,13 @@ def apply_black_white_theme():
             background-color: #FFFFFF !important;
         }
 
-        /* 2. Force ALL text (Typed, Label, Header) to Black */
-        h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stText, span, 
+        /* 2. Force general text to Black */
+        h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stText, 
         [data-testid="stMetricLabel"], [data-testid="stHeader"] {
             color: #000000 !important;
         }
 
-        /* 3. FIXED: Typing Text Color inside Inputs/Textareas */
+        /* 3. Typing Text Color inside Inputs */
         input, textarea {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
@@ -580,41 +580,52 @@ def apply_black_white_theme():
             font-weight: bold;
         }
 
-        /* 5. Buttons: Black Background with White Text */
-        div.stButton > button, .stDownloadButton > button {
+        /* 5. BUTTONS: FIXED TEXT VISIBILITY */
+        /* We target the button and any span/p tags inside it to force them to white */
+        div.stButton > button, 
+        div.stDownloadButton > button, 
+        div.stFormSubmitButton > button {
             background-color: #000000 !important;
             color: #FFFFFF !important;
             border: 1px solid #000000;
             border-radius: 5px;
             font-weight: bold;
-        }
-        
-        div.stButton > button:hover, .stDownloadButton > button:hover {
-            background-color: #333333 !important;
-            color: #FFFFFF !important;
-        }
-
-        /* 6. Form Submission Button */
-        div.stFormSubmitButton > button {
-            background-color: #000000 !important;
-            color: #FFFFFF !important;
+            height: 3em;
             width: 100%;
         }
 
-        /* 7. Icons & Logos */
+        /* Ensure the text inside the button is white */
+        div.stButton > button p, 
+        div.stDownloadButton > button p,
+        div.stButton > button div,
+        div.stDownloadButton > button div,
+        div.stButton > button span,
+        div.stDownloadButton > button span {
+            color: #FFFFFF !important;
+        }
+        
+        /* Hover state */
+        div.stButton > button:hover, 
+        div.stDownloadButton > button:hover {
+            background-color: #333333 !important;
+            border-color: #333333 !important;
+        }
+
+        /* 6. Icons & Logos */
         svg {
             fill: #000000 !important;
         }
 
-        /* 8. Input field borders */
+        /* 7. Input field borders */
         .stTextInput > div > div > input, 
         .stTextArea > div > div > textarea, 
         .stSelectbox > div {
             border: 1px solid #000000 !important;
             background-color: #FFFFFF !important;
+            color: #000000 !important;
         }
         
-        /* 9. Sidebar Styling */
+        /* 8. Sidebar Styling */
         [data-testid="stSidebar"] {
             background-color: #F8F9FA !important;
             border-right: 1px solid #EEEEEE;
