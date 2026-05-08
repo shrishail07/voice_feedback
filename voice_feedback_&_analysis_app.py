@@ -286,37 +286,133 @@ elif page == "Analysis Dashboard":
     else:
         st.header("📊 Cumulative Feedback History")
 
-        # ✅ FIX IS HERE
+        # Load fresh data
         df = load_from_excel()
 
+        # ❌ STOP if no data
         if df.empty:
-            st.info("No data recorded yet.")
-        else:
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Total Feedbacks (All Time)", len(df))
-            m2.metric("Unique Students", df['Roll_Number'].nunique())
-            m3.metric("Avg Sentiment Score", round(df['Polarity'].mean(), 2))
-            
-        tab1, tab2, tab3 = st.tabs(["Event View", "Student History", "Raw Data"])
+            st.warning("⚠️ No data recorded yet. Please submit feedback first.")
+            st.stop()
 
+        # ============================================================
+        # 📊 TOP METRICS
+        # ============================================================
+        m1, m2, m3, m4 = st.columns(4)
+
+        m1.metric("Total Feedbacks", len(df))
+        m2.metric("Unique Students", df['Roll_Number'].nunique())
+        m3.metric("Positive %", round((df['Sentiment'] == "Positive").mean() * 100, 2))
+        m4.metric("Avg Score", round(df['Polarity'].mean(), 2))
+
+        st.markdown("---")
+
+        # ============================================================
+        # 📊 TABS
+        # ============================================================
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "📌 Event Analysis",
+            "👨‍🎓 Student Analysis",
+            "😊 Sentiment Distribution",
+            "📂 Raw Data"
+        ])
+
+        # ============================================================
+        # TAB 1: EVENT ANALYSIS
+        # ============================================================
         with tab1:
-            event = st.selectbox("Select Event", df['Event_Name'].unique())
+            st.subheader("Event-wise Feedback Distribution")
+
+            event_list = df['Event_Name'].unique()
+            event = st.selectbox("Select Event", event_list)
+
             edf = df[df['Event_Name'] == event]
-            fig = px.pie(edf, names='Sentiment', color='Sentiment', 
-                         color_discrete_map={'Positive':'#000000', 'Negative':'#333333', 'Neutral':'#666666'})
-            st.plotly_chart(fig)
 
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.write("### Sentiment Pie Chart")
+                fig = px.pie(
+                    edf,
+                    names='Sentiment',
+                    color='Sentiment',
+                    color_discrete_map={
+                        'Positive': '#2ecc71',
+                        'Negative': '#e74c3c',
+                        'Neutral': '#95a5a6'
+                    }
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+            with col2:
+                st.write("### Event Data")
+                st.dataframe(edf, use_container_width=True)
+
+        # ============================================================
+        # TAB 2: STUDENT ANALYSIS
+        # ============================================================
         with tab2:
-            student_list = df['Student_Name'].unique()
-            sel_student = st.selectbox("Select Student", student_list)
-            sdf = df[df['Student_Name'] == sel_student]
-            st.dataframe(sdf)
+            st.subheader("Student Feedback History")
 
+            student_list = sorted(df['Student_Name'].dropna().unique())
+            student = st.selectbox("Select Student", student_list)
+
+            sdf = df[df['Student_Name'] == student]
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.write("### Student Records")
+                st.dataframe(sdf, use_container_width=True)
+
+            with col2:
+                st.write("### Sentiment Trend")
+                fig = px.line(
+                    sdf,
+                    x='Timestamp',
+                    y='Polarity',
+                    markers=True
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+        # ============================================================
+        # TAB 3: SENTIMENT ANALYSIS
+        # ============================================================
         with tab3:
-            st.dataframe(df)
+            st.subheader("Overall Sentiment Breakdown")
+
+            sentiment_counts = df['Sentiment'].value_counts().reset_index()
+            sentiment_counts.columns = ['Sentiment', 'Count']
+
+            fig = px.bar(
+                sentiment_counts,
+                x='Sentiment',
+                y='Count',
+                color='Sentiment',
+                color_discrete_map={
+                    'Positive': '#2ecc71',
+                    'Negative': '#e74c3c',
+                    'Neutral': '#95a5a6'
+                }
+            )
+
+            st.plotly_chart(fig, use_container_width=True)
+
+        # ============================================================
+        # TAB 4: RAW DATA
+        # ============================================================
+        with tab4:
+            st.subheader("Full Dataset")
+
+            st.dataframe(df, use_container_width=True)
+
             if is_admin:
                 csv = df.to_csv(index=False).encode('utf-8')
-                st.download_button("Download CSV Data", csv, "feedback.csv", "text/csv")
-            else:
-                st.warning("🔒 Please enter the password in the sidebar to download data.")
 
+                st.download_button(
+                    "⬇️ Download CSV Data",
+                    csv,
+                    "feedback_data.csv",
+                    "text/csv"
+                )
+            else:
+                st.warning("🔒 Admin access required to download data.")
