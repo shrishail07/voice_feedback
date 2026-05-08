@@ -63,10 +63,23 @@ st.markdown("""
             padding-bottom: 10px;
         }
 
-        /* ── Section Headers (h2, h3) ── */
+        /* ── Section Headers ── */
         h2, h3 {
             color: #1a1b4b !important;
             font-weight: 700 !important;
+        }
+
+        /* ── Input Field Labels (FIX) ── */
+        .stTextInput label,
+        .stTextArea label,
+        .stSelectbox label,
+        .stFileUploader label,
+        .stRadio label,
+        .stNumberInput label,
+        .stCheckbox label {
+            color: #1a1b4b !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
         }
 
         /* ── Input Fields ── */
@@ -177,7 +190,7 @@ st.markdown("""
             border: 1px solid #e0e4f0;
         }
 
-        /* ── Radio buttons ── */
+        /* ── Radio Buttons ── */
         .stRadio > div {
             background: white;
             border-radius: 10px;
@@ -185,12 +198,33 @@ st.markdown("""
             border: 1px solid #e0e4f0;
         }
 
-        /* ── Download buttons ── */
+        /* ── Download Buttons ── */
         .stDownloadButton > button {
             background: linear-gradient(90deg, #1a1b4b, #2d2f6b) !important;
             color: white !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
+        }
+        .stDownloadButton > button:hover {
+            background: linear-gradient(90deg, #FF6B35, #ff8c42) !important;
+        }
+
+        /* ── Expander ── */
+        .streamlit-expanderHeader {
+            background: white !important;
+            border-radius: 8px !important;
+            color: #1a1b4b !important;
+            font-weight: 600 !important;
+            border: 1px solid #e0e4f0 !important;
+        }
+
+        /* ── Form Container ── */
+        [data-testid="stForm"] {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e0e4f0;
+            box-shadow: 0 2px 8px rgba(26,27,75,0.06);
         }
     </style>
 """, unsafe_allow_html=True)
