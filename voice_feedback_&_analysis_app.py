@@ -29,7 +29,7 @@ except ImportError:
 st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤", layout="wide")
 
 # Company logo
-st.image("pragyan_ai_school_cover.jpg", width=150)
+st.image("pragyan_ai_school_cover.jpg", width=1150)
 
 # --- EXCEL FILE PATH ---
 EXCEL_FILE = "feedback_data.xlsx"
