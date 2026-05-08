@@ -31,6 +31,40 @@ st.set_page_config(page_title="Student Voice Feedback System", page_icon="🎤",
 # Company logo
 st.image("pragyan_ai_school_cover.jpg", width=1150)
 
+st.markdown("""
+    <style>
+        .stApp {
+            background-color: white;
+            color: black;
+        }
+        
+        /* Sidebar */
+        [data-testid="stSidebar"] {
+            background-color: black;
+            color: white;
+        }
+        
+        /* Sidebar text */
+        [data-testid="stSidebar"] * {
+            color: white !important;
+        }
+        
+        /* Buttons */
+        .stButton > button {
+            background-color: black;
+            color: white;
+            border: 1px solid black;
+        }
+        
+        /* Input fields */
+        .stTextInput > div > div > input {
+            background-color: white;
+            color: black;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+
 # --- EXCEL FILE PATH ---
 EXCEL_FILE = "feedback_data.xlsx"
 
