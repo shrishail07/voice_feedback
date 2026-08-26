@@ -1,5 +1,5 @@
 import streamlit as st
-from supabase_auth import get_supabase_client
+from db_auth import get_supabase_client
 
 TABLE = "events"
 
