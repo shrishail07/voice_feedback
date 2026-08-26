@@ -60,11 +60,26 @@ except ImportError:
 EXCEL_FILE = "feedback_data.xlsx"
 ADMIN_PASSWORD = "PRAGYANAI"
 
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 COLUMNS = [
     'Timestamp', 'Student_Name', 'Roll_Number', 'College_Name',
     'Department_name', 'E_mail', 'Phone_number', 'Event_Name',
-    'Face_Detected', 'Transcript', 'Sentiment', 'Polarity'
+    'Face_Detected', 'Transcript', 'Sentiment', 'Polarity',
+    'Photo_Path', 'Audio_Path'
 ]
+
+
+def save_uploaded_file(file_bytes, prefix, roll_no, extension):
+    """Saves bytes to /uploads with a unique name, returns the relative path."""
+    safe_roll = "".join(c for c in str(roll_no) if c.isalnum()) or "unknown"
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{prefix}_{safe_roll}_{timestamp}.{extension}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, "wb") as f:
+        f.write(file_bytes)
+    return filepath
 
 # ============================================================
 # CSS — WHITE BACKGROUND / BLACK BUTTONS / WHITE BUTTON TEXT
@@ -280,8 +295,15 @@ if page == "Record Feedback":
             sentiment, score = analyze_sentiment(transcript)
 
             face_verified = False
+            photo_path = ""
+            audio_path = ""
+
             if img_file:
                 _, _, face_verified = detect_faces(img_file.getvalue())
+                photo_path = save_uploaded_file(img_file.getvalue(), "photo", s_roll, "jpg")
+
+            if audio_data:
+                audio_path = save_uploaded_file(audio_data.getvalue(), "audio", s_roll, "wav")
 
             record = {
                 'Timestamp': datetime.datetime.now(),
@@ -295,7 +317,9 @@ if page == "Record Feedback":
                 'Face_Detected': face_verified,
                 'Transcript': transcript,
                 'Sentiment': sentiment,
-                'Polarity': score
+                'Polarity': score,
+                'Photo_Path': photo_path,
+                'Audio_Path': audio_path
             }
 
             if append_to_excel(record):
@@ -331,9 +355,13 @@ elif page == "Analysis Dashboard":
 
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["📌 Event Analysis", "👨‍🎓 Student Analysis", "😊 Sentiment Analysis", "📂 Raw Data"]
-    )
+    tabs = ["📌 Event Analysis", "👨‍🎓 Student Analysis", "😊 Sentiment Analysis", "📂 Raw Data"]
+    if is_admin:
+        tabs.append("🖼️ Media")
+
+    tab_objs = st.tabs(tabs)
+    tab1, tab2, tab3, tab4 = tab_objs[0], tab_objs[1], tab_objs[2], tab_objs[3]
+    tab5 = tab_objs[4] if is_admin else None
 
     with tab1:
         st.subheader("Event-wise Analysis")
@@ -366,3 +394,30 @@ elif page == "Analysis Dashboard":
         if is_admin:
             csv = df.to_csv(index=False).encode('utf-8')
             st.download_button("⬇️ Download CSV", csv, "feedback.csv", "text/csv")
+
+    if is_admin and tab5 is not None:
+        with tab5:
+            st.subheader("Uploaded Photos & Audio")
+            options = [
+                f"{row['Student_Name']} ({row['Roll_Number']}) — {row['Timestamp']}"
+                for _, row in df.iterrows()
+            ]
+            if not options:
+                st.info("No submissions yet.")
+            else:
+                choice = st.selectbox("Select submission", options)
+                idx = options.index(choice)
+                row = df.iloc[idx]
+
+                photo_path = row.get('Photo_Path', '')
+                audio_path = row.get('Audio_Path', '')
+
+                if isinstance(photo_path, str) and photo_path and os.path.exists(photo_path):
+                    st.image(photo_path, caption="Captured Photo", width=350)
+                else:
+                    st.caption("No photo saved for this submission.")
+
+                if isinstance(audio_path, str) and audio_path and os.path.exists(audio_path):
+                    st.audio(audio_path)
+                else:
+                    st.caption("No audio saved for this submission.")
