@@ -465,13 +465,63 @@ elif page == "Analysis Dashboard":
         st.dataframe(sdf, width='stretch')
 
     with tab3:
-        sentiment_counts = df['Sentiment'].value_counts().reset_index()
-        sentiment_counts.columns = ['Sentiment', 'Count']
-        fig = px.bar(
-            sentiment_counts, x='Sentiment', y='Count', color='Sentiment',
-            color_discrete_map={'Positive': '#2ecc71', 'Negative': '#e74c3c', 'Neutral': '#f1c40f'}
-        )
-        st.plotly_chart(fig, width='stretch')
+        st.subheader("Student Event & Sentiment Breakdown")
+
+        students_df = df[['Student_Name', 'Roll_Number']].drop_duplicates().sort_values('Student_Name')
+        student_options = [
+            f"{row['Student_Name']} ({row['Roll_Number']})"
+            for _, row in students_df.iterrows()
+        ]
+
+        if not student_options:
+            st.info("No submissions yet.")
+        else:
+            choice = st.selectbox("Select Student", student_options, key="sentiment_student_select")
+            selected_roll = choice.split("(")[-1].rstrip(")")
+
+            sdf3 = df[df['Roll_Number'] == selected_roll]
+
+            attended_events = sorted(sdf3['Event_Name'].dropna().unique())
+            total_events = len(get_events())
+
+            c1, c2 = st.columns(2)
+            c1.metric("Events Attended", f"{len(attended_events)} / {total_events}")
+            avg_polarity = sdf3['Polarity'].mean()
+            c2.metric("Avg Sentiment Polarity", round(avg_polarity, 2) if pd.notna(avg_polarity) else "N/A")
+
+            st.markdown(f"**Events attended:** {', '.join(attended_events) if attended_events else 'None'}")
+
+            def _polarity_to_label(p):
+                if p > 0.1:
+                    return "Positive"
+                elif p < -0.1:
+                    return "Negative"
+                return "Neutral"
+
+            event_summary = (
+                sdf3.groupby('Event_Name')
+                .agg(Avg_Polarity=('Polarity', 'mean'), Submissions=('Sentiment', 'count'))
+                .reset_index()
+            )
+            event_summary['Sentiment'] = event_summary['Avg_Polarity'].apply(_polarity_to_label)
+
+            fig = px.bar(
+                event_summary,
+                x='Event_Name',
+                y='Avg_Polarity',
+                color='Sentiment',
+                text='Submissions',
+                color_discrete_map={'Positive': '#2ecc71', 'Negative': '#e74c3c', 'Neutral': '#f1c40f'},
+                title=f"Sentiment by Event — {choice}"
+            )
+            fig.update_traces(texttemplate='%{text} submission(s)', textposition='outside')
+            st.plotly_chart(fig, width='stretch')
+
+            st.dataframe(
+                sdf3[['Timestamp', 'Event_Name', 'Sentiment', 'Polarity', 'Transcript']]
+                .sort_values('Timestamp', ascending=False),
+                width='stretch'
+            )
 
     with tab4:
         st.dataframe(df, width='stretch')
