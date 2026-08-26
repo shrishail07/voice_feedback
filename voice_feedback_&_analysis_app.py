@@ -126,7 +126,7 @@ button[data-baseweb="tab"] { font-weight: 600; }
 """, unsafe_allow_html=True)
 
 # ============================================================
-# LOGIN / SIGNUP GATE (MongoDB-backed)
+# LOGIN / SIGNUP GATE (Supabase-backed)
 # Signed-up students never see the signup form again — they
 # just log in with roll number + password.
 # ============================================================
@@ -447,8 +447,8 @@ elif page == "Analysis Dashboard":
 
     with tab2:
         student_list = sorted(df['Student_Name'].dropna().unique())
-        student = st.selectbox("Select Student", student_list)
-        sdf = df[df['Student_Name'] == student]
+        selected_student = st.selectbox("Select Student", student_list)
+        sdf = df[df['Student_Name'] == selected_student]
         st.dataframe(sdf, width='stretch')
 
     with tab3:
