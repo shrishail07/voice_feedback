@@ -9,7 +9,8 @@ import numpy as np
 from PIL import Image
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from db_auth import signup_student, login_student, logout_student, is_authenticated
+from supabase_auth import signup_student, login_student, logout_student, is_authenticated
+from events_db import get_events, add_event
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -328,6 +329,17 @@ if is_admin:
             "📥 Download Excel", excel_data, "feedback_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+    with st.sidebar.expander("➕ Add New Event"):
+        new_event_name = st.text_input("Event Name", key="new_event_input")
+        if st.button("Add Event", key="add_event_btn"):
+            success, msg = add_event(new_event_name)
+            if success:
+                st.success(msg)
+                st.rerun()
+            else:
+                st.error(msg)
+
 elif pwd_input != "":
     st.sidebar.error("Incorrect Password")
 
@@ -345,7 +357,8 @@ if page == "Record Feedback":
         s_roll = st.text_input("Roll Number *", value=student['roll_number'], disabled=True)
         s_college = st.text_input("College Name", value=student.get('college', ''))
     with col2:
-        s_event = st.selectbox("Event", ["Hackathon 2026", "Science Fair", "Sports Meet", "Other"])
+        event_options = get_events()
+        s_event = st.selectbox("Event", event_options)
         s_email = st.text_input("Email", value=student.get('email', ''))
         s_phone = st.text_input("Phone Number", value=student.get('phone', ''))
 
@@ -418,7 +431,7 @@ elif page == "Analysis Dashboard":
         st.stop()
 
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Total Feedbacks", len(df))
+    m1.metric("Total Active Users", len(df))
     m2.metric("Unique Students", df['Roll_Number'].nunique())
     positive_percent = round((df['Sentiment'] == "Positive").mean() * 100, 2)
     m3.metric("Positive %", f"{positive_percent}%")
