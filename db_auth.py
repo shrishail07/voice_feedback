@@ -2,65 +2,52 @@ import streamlit as st
 import hashlib
 import os
 import datetime
-import certifi
-from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError
+from supabase import create_client, Client
 
 # ============================================================
 # CONNECTION
 # ============================================================
 
 @st.cache_resource
-def get_mongo_client():
+def get_supabase_client() -> Client:
     """
-    Reads MONGO_URI from Streamlit secrets (or env var as fallback).
+    Reads SUPABASE_URL and SUPABASE_KEY from Streamlit secrets (or env vars).
     On Streamlit Cloud: Settings -> Secrets -> add
-        MONGO_URI = "mongodb+srv://user:password@cluster.mongodb.net/?retryWrites=true&w=majority"
+        SUPABASE_URL = "https://xxxxx.supabase.co"
+        SUPABASE_KEY = "your-anon-or-service-role-key"
     """
-    uri = st.secrets.get("MONGO_URI", os.environ.get("MONGO_URI", ""))
+    url = st.secrets.get("SUPABASE_URL", os.environ.get("SUPABASE_URL", ""))
+    key = st.secrets.get("SUPABASE_KEY", os.environ.get("SUPABASE_KEY", ""))
 
-    if not uri:
+    if not url or not key:
         st.error(
-            "MongoDB connection string not configured. "
-            "Add MONGO_URI under Streamlit Cloud → Settings → Secrets."
+            "Supabase credentials not configured. "
+            "Add SUPABASE_URL and SUPABASE_KEY under Streamlit Cloud → Settings → Secrets."
         )
         st.stop()
 
     try:
-        client = MongoClient(
-            uri,
-            tls=True,
-            tlsCAFile=certifi.where(),
-            serverSelectionTimeoutMS=5000,
-        )
-        client.admin.command("ping")  # fail fast if URI/creds are wrong
-        return client
+        return create_client(url, key)
     except Exception as e:
-        st.error(f"Could not connect to MongoDB: {e}")
+        st.error(f"Could not connect to Supabase: {e}")
         st.stop()
 
 
-def get_students_collection():
-    client = get_mongo_client()
-    db = client["pragyanai_feedback"]
-    collection = db["students"]
-    collection.create_index("roll_number", unique=True)
-    return collection
+TABLE = "students"
 
 # ============================================================
-# PASSWORD HASHING (PBKDF2 — no extra native dependency needed)
+# PASSWORD HASHING (PBKDF2, stored as hex strings — Postgres friendly)
 # ============================================================
 
-def _hash_password(password, salt=None):
-    if salt is None:
-        salt = os.urandom(16)
+def _hash_password(password, salt_hex=None):
+    salt = bytes.fromhex(salt_hex) if salt_hex else os.urandom(16)
     pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100_000)
-    return pwd_hash, salt
+    return pwd_hash.hex(), salt.hex()
 
 
-def _verify_password(password, salt, stored_hash):
-    pwd_hash, _ = _hash_password(password, salt)
-    return pwd_hash == stored_hash
+def _verify_password(password, salt_hex, stored_hash_hex):
+    pwd_hash_hex, _ = _hash_password(password, salt_hex)
+    return pwd_hash_hex == stored_hash_hex
 
 # ============================================================
 # AUTH ACTIONS
@@ -73,29 +60,35 @@ def signup_student(roll_number, full_name, email, phone, college, department, pa
     if not roll_number or not full_name or not password:
         return False, "Roll number, name and password are required."
 
-    collection = get_students_collection()
+    client = get_supabase_client()
 
-    if collection.find_one({"roll_number": roll_number}):
+    existing = (
+        client.table(TABLE)
+        .select("roll_number")
+        .eq("roll_number", roll_number)
+        .execute()
+    )
+    if existing.data:
         return False, "An account with this roll number already exists. Please log in instead."
 
-    pwd_hash, salt = _hash_password(password)
+    pwd_hash_hex, salt_hex = _hash_password(password)
 
-    doc = {
+    row = {
         "roll_number": roll_number,
         "full_name": full_name,
         "email": (email or "").strip(),
         "phone": (phone or "").strip(),
         "college": (college or "").strip(),
         "department": (department or "").strip(),
-        "password_hash": pwd_hash,
-        "password_salt": salt,
-        "created_at": datetime.datetime.utcnow(),
+        "password_hash": pwd_hash_hex,
+        "password_salt": salt_hex,
+        "created_at": datetime.datetime.utcnow().isoformat(),
     }
 
     try:
-        collection.insert_one(doc)
-    except DuplicateKeyError:
-        return False, "An account with this roll number already exists. Please log in instead."
+        client.table(TABLE).insert(row).execute()
+    except Exception as e:
+        return False, f"Signup failed: {e}"
 
     return True, "Account created successfully."
 
@@ -106,11 +99,22 @@ def login_student(roll_number, password):
     if not roll_number or not password:
         return False, "Roll number and password are required."
 
-    collection = get_students_collection()
-    student = collection.find_one({"roll_number": roll_number})
+    client = get_supabase_client()
 
-    if not student:
+    try:
+        result = (
+            client.table(TABLE)
+            .select("*")
+            .eq("roll_number", roll_number)
+            .execute()
+        )
+    except Exception as e:
+        return False, f"Login failed: {e}"
+
+    if not result.data:
         return False, "No account found with that roll number. Please sign up first."
+
+    student = result.data[0]
 
     if not _verify_password(password, student["password_salt"], student["password_hash"]):
         return False, "Incorrect password."
