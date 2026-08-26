@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from db_auth import signup_student, login_student, logout_student, is_authenticated
+from supabase_auth import signup_student, login_student, logout_student, is_authenticated
 
 # ============================================================
 # PAGE CONFIGURATION
