@@ -2,6 +2,7 @@ import streamlit as st
 import hashlib
 import os
 import datetime
+import certifi
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 
@@ -26,7 +27,12 @@ def get_mongo_client():
         st.stop()
 
     try:
-        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
+        client = MongoClient(
+            uri,
+            tls=True,
+            tlsCAFile=certifi.where(),
+            serverSelectionTimeoutMS=5000,
+        )
         client.admin.command("ping")  # fail fast if URI/creds are wrong
         return client
     except Exception as e:
