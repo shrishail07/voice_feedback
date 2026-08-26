@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from db_auth import signup_student, login_student, logout_student, is_authenticated
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -125,6 +126,71 @@ button[data-baseweb="tab"] { font-weight: 600; }
 """, unsafe_allow_html=True)
 
 # ============================================================
+# LOGIN / SIGNUP GATE (MongoDB-backed)
+# Signed-up students never see the signup form again — they
+# just log in with roll number + password.
+# ============================================================
+
+if not is_authenticated():
+
+    st.title("🎤 Student Voice Feedback System")
+    st.caption("PragyanAI · Grow with Gyan")
+
+    tab_login, tab_signup = st.tabs(["🔑 Login", "📝 Sign Up"])
+
+    with tab_login:
+        with st.form("login_form"):
+            st.subheader("Welcome back")
+            l_roll = st.text_input("Roll Number", key="login_roll")
+            l_password = st.text_input("Password", type="password", key="login_pass")
+            login_submitted = st.form_submit_button("Login")
+
+            if login_submitted:
+                success, message = login_student(l_roll, l_password)
+                if success:
+                    st.success(message)
+                    st.rerun()
+                else:
+                    st.error(message)
+
+    with tab_signup:
+        with st.form("signup_form"):
+            st.subheader("Create your account")
+
+            sc1, sc2 = st.columns(2)
+            with sc1:
+                su_name = st.text_input("Full Name *")
+                su_roll = st.text_input("Roll Number *")
+                su_college = st.text_input("College Name")
+            with sc2:
+                su_email = st.text_input("Email")
+                su_phone = st.text_input("Phone Number")
+                su_dept = st.text_input("Department")
+
+            su_password = st.text_input("Create Password *", type="password")
+            su_password_confirm = st.text_input("Confirm Password *", type="password")
+
+            signup_submitted = st.form_submit_button("Create Account")
+
+            if signup_submitted:
+                if su_password != su_password_confirm:
+                    st.error("Passwords do not match.")
+                else:
+                    success, message = signup_student(
+                        su_roll, su_name, su_email, su_phone,
+                        su_college, su_dept, su_password
+                    )
+                    if success:
+                        st.success(message + " Switch to the Login tab to sign in.")
+                    else:
+                        st.error(message)
+
+    st.stop()
+
+# From here on, the student is authenticated.
+student = st.session_state["student"]
+
+# ============================================================
 # EXCEL HELPERS
 # ============================================================
 
@@ -236,6 +302,11 @@ def transcribe_audio(audio_bytes):
 
 st.title("🎤 Student Voice Feedback System")
 
+st.sidebar.success(f"👤 {student['full_name']} ({student['roll_number']})")
+if st.sidebar.button("Log Out"):
+    logout_student()
+    st.rerun()
+
 if not HAS_CV2:
     st.sidebar.warning(
         "⚠️ Face verification is disabled on this server "
@@ -270,13 +341,13 @@ if page == "Record Feedback":
 
     col1, col2 = st.columns(2)
     with col1:
-        s_name = st.text_input("Full Name *")
-        s_roll = st.text_input("Roll Number *")
-        s_college = st.text_input("College Name")
+        s_name = st.text_input("Full Name *", value=student['full_name'], disabled=True)
+        s_roll = st.text_input("Roll Number *", value=student['roll_number'], disabled=True)
+        s_college = st.text_input("College Name", value=student.get('college', ''))
     with col2:
         s_event = st.selectbox("Event", ["Hackathon 2026", "Science Fair", "Sports Meet", "Other"])
-        s_email = st.text_input("Email")
-        s_phone = st.text_input("Phone Number")
+        s_email = st.text_input("Email", value=student.get('email', ''))
+        s_phone = st.text_input("Phone Number", value=student.get('phone', ''))
 
     st.subheader("📸 Capture Photo")
     img_file = st.camera_input("Take Photo")
