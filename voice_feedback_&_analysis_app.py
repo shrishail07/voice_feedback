@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from DB_Auth import signup_student, login_student, logout_student, is_authenticated
+from db_auth import signup_student, login_student, logout_student, is_authenticated
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 if os.path.exists("pragyan_ai_school_cover.jpg"):
-    st.image("pragyan_ai_school_cover.jpg", use_container_width=True)
+    st.image("pragyan_ai_school_cover.jpg", width='stretch')
 
 # ============================================================
 # OPTIONAL: OPENCV FACE DETECTION
@@ -442,14 +442,14 @@ elif page == "Analysis Dashboard":
             edf, names='Sentiment', color='Sentiment',
             color_discrete_map={'Positive': '#2ecc71', 'Negative': '#e74c3c', 'Neutral': '#f1c40f'}
         )
-        st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(edf, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
+        st.dataframe(edf, width='stretch')
 
     with tab2:
         student_list = sorted(df['Student_Name'].dropna().unique())
         student = st.selectbox("Select Student", student_list)
         sdf = df[df['Student_Name'] == student]
-        st.dataframe(sdf, use_container_width=True)
+        st.dataframe(sdf, width='stretch')
 
     with tab3:
         sentiment_counts = df['Sentiment'].value_counts().reset_index()
@@ -458,10 +458,10 @@ elif page == "Analysis Dashboard":
             sentiment_counts, x='Sentiment', y='Count', color='Sentiment',
             color_discrete_map={'Positive': '#2ecc71', 'Negative': '#e74c3c', 'Neutral': '#f1c40f'}
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     with tab4:
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, width='stretch')
         if is_admin:
             csv = df.to_csv(index=False).encode('utf-8')
             st.download_button("⬇️ Download CSV", csv, "feedback.csv", "text/csv")
